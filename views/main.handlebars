@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>counting-game</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link type="text/css" rel="stylesheet" href="style.css">
+    <link type="text/css" rel="stylesheet" href="alertify.min.css">
+    <link type="text/css" rel="stylesheet" href="default.min.css">
+    <link type="text/css" rel="stylesheet" href="nprogress.css">
+    <link href="http://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div id="currentNumber">{...}</div>
+
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-color/2.1.2/jquery.color.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pleasejs/0.2.0/Please.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.4.1/jquery.timeago.min.js"></script>
+    <script src="/progress.min.js"></script>
+    <script src="/alertify.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        $(document).ready(function() {
+            $(".timeago").timeago();
+        });
+    </script>
+    <script>
+        alertify.defaults.glossary.title = "counting-game";
+        $("#currentNumber").html("");
+        var circle = new ProgressBar.Circle('#currentNumber', {
+            color: '#56bcc7',
+            strokeWidth: 3,
+            trailWidth: 1,
+            duration: 500,
+            text: {
+                value: '0'
+            }
+        });
+        circle.setText("...");
+
+        circle.animate(1, function() {
+            circle.animate(0);
+        });
+
+        alertify.alert("this is a beta.");
+
+        var keyPressed = false;
+
+        $(document).on('keydown', function(e) {
+            var key;
+            if (keyPressed === false) {
+                key = String.fromCharCode(e.keyCode);
+
+                if (key === ' ') {
+                    keyPressed = true;
+                    console.log(key);
+                    circle.animate(1);
+                    $(this).on('keyup', function() {
+                        if (keyPressed === true) {
+                            keyPressed = false;
+                        }
+                    });
+                    var timesRun = 0;
+                    var interval = setInterval(function(){
+                        if(!keyPressed){
+                            clearInterval(interval);
+                            circle.animate(0);
+                            socket.emit('stop click', {});
+                            return;
+                        }
+                        timesRun++;
+                        if(timesRun == 500/5) {
+                                circle.set(0);
+                                clearInterval(interval);
+                        }
+                    }, 5);
+                    socket.emit('start click', {});
+                }
+            }
+        });
+        function dark(){
+            $("html").animate({'background-color': "rgb(0, 0, 0)"});
+        }
+        function light(){
+            $("html").animate({'background-color': "rgb(255, 255, 255)"});
+        }
+    </script>
+    <script>
+        var socket = io();
+        socket.on('connect', function () {
+            alertify.success("Connected.");
+        });
+
+        socket.on('number', function(data){
+            circle.setText(data.setTo);
+        });
+        socket.on('game stats', function(data){
+            alertify.message("There " + (data.swarmCount == 1 ? "is " : "are ") + data.swarmCount + " users in the game.");
+        });
+    </script>
+</body>
+</html>
