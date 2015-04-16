@@ -63,5 +63,5 @@ io.on('connection', function(socket){
 });
 io.on('disconnect', function() { connectedCount--; });
 function serializeSocket(socket){
-    return process.env.PORT != null ? socket.handshake.address.address : socket.id; //TODO add an env variable to detect heroku
+    return socket.id; //TODO add an env variable to detect heroku
 }
