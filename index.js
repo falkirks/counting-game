@@ -32,24 +32,24 @@ io.on('connection', function(socket){
     connectedCount++;
     socket.emit("number", {setTo: currentNumber, isRestart: false});
     socket.on('start click', function(data){
-        if(!isClicking){
-            if(serializeSocket(socket) !== lastClicker) {
+        if(serializeSocket(socket) !== lastClicker) {
+            if (!isClicking) {
                 lastClicker = serializeSocket(socket);
                 isClicking = true;
-                nextClickTimeout = setTimeout(function(){
+                nextClickTimeout = setTimeout(function () {
                     oldClicker = lastClicker;
                     isClicking = false;
                     currentNumber++;
                     io.emit("number", {setTo: currentNumber, isRestart: false});
                 }, 500);
             }
-        }
-        else{
-            currentNumber = 0;
-            oldClicker = false;
-            lastClicker = false;
-            isClicking = false;
-            io.emit("number", {setTo: currentNumber, isRestart: true});
+            else {
+                currentNumber = 0;
+                oldClicker = false;
+                lastClicker = false;
+                isClicking = false;
+                io.emit("number", {setTo: currentNumber, isRestart: true});
+            }
         }
     });
     socket.on('stop click', function(data){
