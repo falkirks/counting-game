@@ -5,3 +5,6 @@ This game is a recreation of the somewhat over-popular acting game of the same n
 ### Modifications for online play
 * Simple click and hold to increment 
 * Click lasts 0.5 seconds, during this time, other people can screw up.
+
+### Live Version
+A live version is available at https://counting-game.herokuapp.com 
